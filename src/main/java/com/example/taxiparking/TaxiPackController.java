@@ -1,6 +1,8 @@
 package com.example.taxiparking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,28 +11,36 @@ import java.util.List;
 @RequestMapping("/taxiPark")
 public class TaxiPackController {
 
-    @Autowired
-    private TaxiParkService taxiParkService;
-    @PostMapping("/{Id}")
-    public void createTaxiPark(@RequestBody TaxiPark taxiPark){
-        taxiParkService.createTaxiPark(taxiPark);
+
+    private final TaxiParkService taxiParkService;
+    public TaxiPackController(TaxiParkService taxiParkService) {
+        this.taxiParkService = taxiParkService;
+    }
+    @PostMapping
+    public ResponseEntity<TaxiPark> createTaxiPark(@RequestBody TaxiPark taxiPark){
+        TaxiPark saved =  taxiParkService.createTaxiPark(taxiPark);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        //we shall begin from here
     }
     @GetMapping("/{Id}")
-    public TaxiPark getTaxiPark(@PathVariable("Id") Long id){
-       return taxiParkService.getTaxiParkById(id);
+    public ResponseEntity<TaxiPark> getTaxiPark(@PathVariable("Id") Long id){
+        TaxiPark taxiPark = taxiParkService.getTaxiParkById(id);
+       return ResponseEntity.ok(taxiPark);
     }
     @PutMapping("/{Id}")
-    public void updateTaxiPark(@PathVariable("Id") Long Id, @RequestBody TaxiPark taxiPark){
-        taxiPark.setId(Id);
-        taxiParkService.updateTaxiPark(taxiPark);
+    public ResponseEntity<TaxiPark> updateTaxiPark(@PathVariable("Id") Long Id, @RequestBody TaxiPark taxiPark){
+        TaxiPark updated = taxiParkService.updateTaxiPark(Id, taxiPark);
+        return ResponseEntity.ok(updated);
 
     }
     @DeleteMapping("/{Id}")
-    public void deleteTaxiPark(@PathVariable("Id") Long id){
+    public ResponseEntity<Void> deleteTaxiPark(@PathVariable("Id") Long id){
         taxiParkService.deleteTaxiPark(id);
+        return ResponseEntity.noContent().build();
     }
     @GetMapping
-    public List<TaxiPark> getAllTaxiParks(){
-    return taxiParkService.getAllTaxiParks();
+    public ResponseEntity <List<TaxiPark>> getAllTaxiParks(){
+    List<TaxiPark> taxiParks= taxiParkService.getAllTaxiParks();
+    return ResponseEntity.ok(taxiParks);
     }
 }
